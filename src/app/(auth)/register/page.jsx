@@ -14,7 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { toast } from '@/components/ui/toast';
+import { toast } from 'react-hot-toast';
+import { authApi } from '@/features/auth/api/authApi';
+import { getFieldErrors } from '@/lib/utils/errorHandler';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 
@@ -53,6 +55,7 @@ export default function RegisterPage() {
         register,
         handleSubmit,
         watch,
+        setError: setFormError,
         formState: { errors, isSubmitting },
     } = useForm({
         resolver: zodResolver(registerSchema),
@@ -94,18 +97,30 @@ export default function RegisterPage() {
         setError('');
 
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const response = await authApi.register({
+                name: data.name,
+                email: data.email,
+                password: data.password,
+            });
 
-            // Simulate email already exists error
-            if (Math.random() > 0.8) {
-                throw new Error('An account with this email already exists');
+            if (response) {
+                toast.success('Account created successfully! Please check your email to verify your account.');
+                // Redirect to login or verification page
+                router.push('/login?verified=false');
             }
-
-            toast.success('Account created successfully!');
-            router.push('/dashboard');
         } catch (err) {
-            setError(err.message || 'Registration failed. Please try again.');
-            toast.error('Registration failed');
+            const errorMessage = err.message || 'Registration failed. Please try again.';
+            setError(errorMessage);
+            
+            // Set field-level errors if available
+            if (err.details && Array.isArray(err.details)) {
+                const fieldErrors = getFieldErrors(err);
+                Object.keys(fieldErrors).forEach((field) => {
+                    setFormError(field, { message: fieldErrors[field] });
+                });
+            }
+            
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

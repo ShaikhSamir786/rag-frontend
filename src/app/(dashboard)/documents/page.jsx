@@ -1,25 +1,30 @@
-import { Suspense } from 'react';
+'use client';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { DocumentList } from '@/components/features/documents/DocumentList';
+import { DocumentFilters } from '@/components/features/documents/DocumentFilters';
+import { useDispatch } from 'react-redux';
+import { setFilters } from '@/features/documents/store/documentsSlice';
 
-export const metadata = {
-    title: 'Documents | RAG Platform',
-};
+export default function DocumentsPage() {
+    const dispatch = useDispatch();
+    const [filters, setFiltersState] = useState({});
 
-// Components stubs
-const DocumentFilters = ({ initialStatus, initialSearch }) => <div>Filters</div>;
-const DocumentList = ({ page, status, search }) => <div>Document List</div>;
+    const handleFilterChange = (newFilters) => {
+        setFiltersState(newFilters);
+        dispatch(setFilters(newFilters));
+    };
 
-export default function DocumentsPage({ searchParams }) {
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Documents</h1>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         Manage and analyze your documents
                     </p>
                 </div>
@@ -32,12 +37,13 @@ export default function DocumentsPage({ searchParams }) {
             </div>
 
             {/* Filters */}
-            <DocumentFilters />
+            <DocumentFilters
+                filters={filters}
+                onFilterChange={handleFilterChange}
+            />
 
             {/* Document List */}
-            <Suspense fallback={<LoadingSpinner />}>
-                <DocumentList />
-            </Suspense>
+            <DocumentList filters={filters} />
         </div>
     );
 }

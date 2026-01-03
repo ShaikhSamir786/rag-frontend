@@ -8,8 +8,12 @@ const initialState = {
         page: 1,
         limit: 10,
         total: 0,
+        totalPages: 0,
     },
     isLoading: false,
+    uploadProgress: {}, // { documentId: progressPercentage }
+    uploading: false,
+    statistics: null,
 };
 
 const documentsSlice = createSlice({
@@ -43,6 +47,20 @@ const documentsSlice = createSlice({
         setLoading: (state, action) => {
             state.isLoading = action.payload;
         },
+        setUploadProgress: (state, action) => {
+            const { documentId, progress } = action.payload;
+            state.uploadProgress[documentId] = progress;
+        },
+        setUploading: (state, action) => {
+            state.uploading = action.payload;
+        },
+        clearUploadProgress: (state, action) => {
+            const documentId = action.payload;
+            delete state.uploadProgress[documentId];
+        },
+        setStatistics: (state, action) => {
+            state.statistics = action.payload;
+        },
     },
 });
 
@@ -55,6 +73,10 @@ export const {
     setFilters,
     setPagination,
     setLoading,
+    setUploadProgress,
+    setUploading,
+    clearUploadProgress,
+    setStatistics,
 } = documentsSlice.actions;
 
 export default documentsSlice.reducer;
