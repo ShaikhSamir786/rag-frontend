@@ -1,23 +1,30 @@
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
-import { SmoothScroller } from '@/components/common/SmoothScroller';
-import '@/styles/globals.css';
+import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-inter',
+    display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ['latin'],
+    variable: '--font-jetbrains-mono',
+    display: 'swap',
+});
 
 export const metadata = {
     title: 'RAG Platform - Enterprise Document Intelligence',
-    description: 'AI-powered document analysis and intelligent search',
-    keywords: ['RAG', 'AI', 'Documents', 'Search'],
+    description: 'AI-powered document analysis and intelligent search with RAG technology',
+    keywords: ['RAG', 'AI', 'Documents', 'Search', 'Enterprise', 'Intelligence'],
 };
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
             <body className={inter.className}>
-                <SmoothScroller>
-                    <Providers>{children}</Providers>
-                </SmoothScroller>
+                <Providers>{children}</Providers>
             </body>
         </html>
     );
