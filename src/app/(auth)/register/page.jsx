@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Loader2, Check, X } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
@@ -55,6 +55,7 @@ export default function RegisterPage() {
         register,
         handleSubmit,
         watch,
+        control,
         setError: setFormError,
         formState: { errors, isSubmitting },
     } = useForm({
@@ -111,7 +112,7 @@ export default function RegisterPage() {
         } catch (err) {
             const errorMessage = err.message || 'Registration failed. Please try again.';
             setError(errorMessage);
-            
+
             // Set field-level errors if available
             if (err.details && Array.isArray(err.details)) {
                 const fieldErrors = getFieldErrors(err);
@@ -119,7 +120,7 @@ export default function RegisterPage() {
                     setFormError(field, { message: fieldErrors[field] });
                 });
             }
-            
+
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
@@ -272,13 +273,25 @@ export default function RegisterPage() {
                             </div>
 
                             <div className="flex items-start space-x-2">
-                                <Checkbox
-                                    id="terms"
-                                    {...register('terms')}
-                                    disabled={isLoading}
-                                    className="mt-0.5 border-white/20 data-[state=checked]:bg-brand-500"
-                                    aria-invalid={errors.terms ? 'true' : 'false'}
-                                    aria-describedby={errors.terms ? 'terms-error' : undefined}
+                                <Controller
+                                    name="terms"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            id="terms"
+                                            ref={field.ref}
+                                            checked={field.value}
+                                            onCheckedChange={(c) => {
+                                                const isChecked = c === true;
+                                                console.log('Checkbox changed:', c, '->', isChecked);
+                                                field.onChange(isChecked);
+                                            }}
+                                            disabled={isLoading}
+                                            className="mt-0.5 border-white/20 data-[state=checked]:bg-brand-500"
+                                            aria-invalid={errors.terms ? 'true' : 'false'}
+                                            aria-describedby={errors.terms ? 'terms-error' : undefined}
+                                        />
+                                    )}
                                 />
                                 <div className="space-y-1">
                                     <Label htmlFor="terms" className="text-sm text-white/70 cursor-pointer font-normal leading-relaxed">
@@ -297,6 +310,11 @@ export default function RegisterPage() {
                                         </p>
                                     )}
                                 </div>
+                            </div>
+
+                            <div className="p-2 my-2 bg-black/80 text-xs font-mono text-yellow-400 rounded border border-yellow-400/30">
+                                <p>Terms Value: {String(watch('terms'))} ({typeof watch('terms')})</p>
+                                <p>Terms Error: {errors.terms?.message || 'None'}</p>
                             </div>
 
                             <Button
