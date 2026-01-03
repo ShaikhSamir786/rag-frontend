@@ -1,7 +1,7 @@
 'use client';
 
 import { Provider as ReduxProvider } from 'react-redux';
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TenantProvider } from '@/lib/tenant/TenantContext';
 import { ThemeProvider } from '@/lib/theme/ThemeProvider';
