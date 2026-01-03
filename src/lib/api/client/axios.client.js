@@ -1,22 +1,21 @@
 import axios from 'axios';
-// import { authInterceptor } from '../interceptors/auth.interceptor';
-// import { tenantInterceptor } from '../interceptors/tenant.interceptor';
-// import { errorInterceptor } from '../interceptors/error.interceptor';
+import { API_CONFIG } from '@/config/api.config';
+import { authInterceptor } from '../interceptors/auth.interceptor';
+import { tenantInterceptor } from '../interceptors/tenant.interceptor';
+import { errorInterceptor } from '../interceptors/error.interceptor';
 
 class ApiClient {
     constructor() {
         this.client = axios.create({
-            baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
-            timeout: 30000,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            baseURL: API_CONFIG.BASE_URL,
+            timeout: API_CONFIG.TIMEOUT,
+            headers: API_CONFIG.HEADERS,
         });
 
         // Apply interceptors
-        // authInterceptor(this.client);
-        // tenantInterceptor(this.client);
-        // errorInterceptor(this.client);
+        authInterceptor(this.client);
+        tenantInterceptor(this.client);
+        errorInterceptor(this.client);
     }
 
     static getInstance() {
